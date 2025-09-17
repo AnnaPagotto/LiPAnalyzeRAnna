@@ -889,6 +889,9 @@ previously used in the RUV models.")
     }
     colnames(modelCoef) <- cols
     colnames(modelPv) <- cols
+  #Anna START
+    colnames(modelFitt) <- cols
+  #Anna STOP
 
     return(list(modelCoeff=modelCoef, modelPv=modelPv, modelFitt=modelFitt)) #Anna added modelFitt
 }
