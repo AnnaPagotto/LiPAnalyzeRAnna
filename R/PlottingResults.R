@@ -31,42 +31,65 @@
 #'
 #' @export
 #'
-makeVolcanoPlot <- function(sumDf, coefCol="Coefficient", pvalCol="Padj",
-                            pvalCutoff=0.05, xlim=NULL, ylim=NULL){
+makeWoodsPlotProteinList <- function(sumDf, annotPP, coefCol="Coefficient",
+                                     pvalCol="Padj", nameProtQuant="Protein",
+                                     startPosition="startPosition",
+                                     endPosition="endPosition", pvalCutoff=0.05,
+                                     deltaColorIsTryptic=FALSE,
+                                     isTryptic="isTryptic",
+                                     nameFT=c("Specific"),
+                                     nameHT=c("Specific-C", "Specific-N"),
+                                     sigProt=TRUE, protVector=NULL,
+                                     showPv=FALSE, export=FALSE, file=NULL){
+
+    ## checking input
+    if(length(intersect(row.names(sumDf), row.names(annotPP))) == 0){
+        stop("Row names of sumDf and annotPP do not match.")
+    }
+    if(sigProt == FALSE &is.null(protVector)){
+        stop("No proteins chosen. Either set 'sigProt' to TRUE or provide a
+character vector giving proteins you want plotted in form of 'protVector'.")
+    }
+    if(export&is.null(file)){
+        stop("'export' is set to TRUE, but path and file name are not defined in
+'file'.")
+    }
 
     ## creating data.frame for plotting
-    plotData <- data.frame(Coef=sumDf[, coefCol],
-                           log10Pv=-log10(sumDf[,pvalCol]),
-                           sig=sumDf[,pvalCol]< pvalCutoff)
-    plotData <- plotData[order(plotData$sig), ]
+    plotData <- getPlottingFormat(sumDf, annotPP, coefCol, pvalCol,
+                                  nameProtQuant, startPosition, endPosition,
+                                  pvalCutoff, deltaColorIsTryptic, isTryptic,
+                                  nameFT, nameHT)
 
-    if(is.null(xlim)){
-        xlim <- c(min(stats::na.omit(plotData[, "Coef"])),
-                  max(stats::na.omit(plotData[, "Coef"])))
+    if(sigProt){
+        message("Plotting proteins with at least one significant peptide.")
+        plotData <- plotData[unlist(lapply(plotData, \(x){
+            any(x$Pval <= pvalCutoff)
+        }))]
     }
-    if(is.null(ylim)){
-        ylim <- c(0, max(stats::na.omit(plotData[, "log10Pv"])))
+    else{
+        plotData <- plotData[protVector]
     }
 
-    ## creating volcano plot
-    volcanoPlot <- ggplot2::ggplot(mapping=ggplot2::aes(
-        x=plotData[, "Coef"],
-        y=plotData[, "log10Pv"],
-        color=plotData[, "sig"],
-        alpha=plotData[, "sig"])) +
-        ggplot2::geom_point(size=2) +
-        ggplot2::xlim(xlim) +
-        ggplot2::ylim(ylim) +
-        ggplot2::xlab("Coefficient") +
-        ggplot2::ylab("log10(p-value)") +
-        ggplot2::scale_color_manual(name=paste0("Pval < ", pvalCutoff),
-                                    values=c("#000000", "#c11509")) +
-        ggplot2::scale_alpha_manual(name=paste0("Pval < ", pvalCutoff),
-                                    values=c(0.3, 1)) +
-        ggplot2::theme_bw(base_size=15)
+    if(all(unlist(lapply(plotData, is.null)))){
+        message("\033[35mNo proteins remaining to be plotted.\033[0m") ## Anna, in case the protein you are searching is not in the dataset (sum)
+       } else {
 
-    return(volcanoPlot)
+    # creating list of protein plots
+    plotList <- lapply(plotData, \(x){
+        plottingProtein(plotData=x, deltaColorIsTryptic=deltaColorIsTryptic,
+                        showPv=showPv, export=export)
+    })
+
+    ## creating and writing pdf if export=TRUE
+    if(export){
+        exportWoodsPlots(plotList, length(plotList), file)
+    }
+
+    return(plotList)
+    }
 }
+
 
 
 #' @title Creating PCA plot
