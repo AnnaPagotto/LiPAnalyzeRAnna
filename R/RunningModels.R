@@ -854,6 +854,13 @@ extractContrast <- function(mContrast, formulaContrast, dfRUV,
         as.data.frame(t(stats::coef(x)))
     }))
 
+#### ANNA START:
+  ## extract coefficients from contrast models
+   # modelResponseused <- do.call(plyr::rbind.fill, lapply(mContrast, function(x){
+   #     as.data.frame(t(stats::coef(x)))
+   # }))
+#### ANNA STOP
+  
     ## if RUV was not run before, extract p-values directly from contrast models
     if(is.null(dfRUV)){
         modelPv <- do.call(plyr::rbind.fill, lapply(mContrast, function(x){
