@@ -637,6 +637,10 @@ plausibility.")
     }
 
     return(resAll)
+#### ANNA START:
+  return(modelMat)
+  return(modelContrast)
+#### ANNA STOP
 }
 
 
