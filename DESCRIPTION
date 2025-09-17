@@ -1,4 +1,4 @@
-Package: LiPAnalyzeR_Anna
+Package: LiPAnalyzeRAnna
 Type: Package
 Title: Infer protein accessibility changes from LiP-MS data
 Version: 0.1.0.1
