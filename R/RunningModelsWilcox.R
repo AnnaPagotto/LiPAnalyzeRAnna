@@ -1,5 +1,7 @@
 ## Anna: in the contrast, run wilcox test instead of t-statistics that you do with linear regression. In case after the RUV the residuals are not normally distributed.
 
+globalVariables(names=c("XPep", "XProt", "Y"))
+
 
 runModel_wilcox <- function(quantityList, annotS=NULL, formulaRUV="Y~XPep+XProt",
                      formulaContrast="Y~Condition", lowRUV=c(-1e9, 0, 0),
