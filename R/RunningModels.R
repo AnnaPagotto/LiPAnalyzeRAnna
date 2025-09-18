@@ -855,11 +855,6 @@ extractContrast <- function(mContrast, formulaContrast, dfRUV,
         as.data.frame(t(stats::coef(x)))
     }))
 
-#### ANNA START:
-   modelFitt <- do.call(plyr::rbind.fill, lapply(mContrast, function(x){
-        as.data.frame(t(stats::fitted(x)))
-    }))
-#### ANNA STOP
   
     ## if RUV was not run before, extract p-values directly from contrast models
     if(is.null(dfRUV)){
@@ -889,11 +884,9 @@ previously used in the RUV models.")
     }
     colnames(modelCoef) <- cols
     colnames(modelPv) <- cols
-  #Anna START
-    colnames(modelFitt) <- cols
-  #Anna STOP
+ 
 
-    return(list(modelCoeff=modelCoef, modelPv=modelPv, modelFitt=modelFitt)) #Anna added modelFitt
+    return(list(modelCoeff=modelCoef, modelPv=modelPv)) 
 }
 
 
